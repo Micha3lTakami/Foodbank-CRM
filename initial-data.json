@@ -1,0 +1,543 @@
+{
+  "inventory": {
+    "inv_001": {
+      "itemId": "inv_001",
+      "name": "Chicken Breast",
+      "category": "protein",
+      "quantity": 25,
+      "unitType": "lbs",
+      "weight": 25.0,
+      "bestByDate": "2025-11-18",
+      "receiptDate": "2025-11-15",
+      "handlingType": "refrigerated",
+      "perishabilityTier": "high_48h",
+      "familyMax": 5,
+      "supplierId": "sup_003",
+      "donorId": "sup_003",
+      "fundingSource": "private_donation",
+      "recipientEligibility": "universal",
+      "lotNumber": null,
+      "status": "available"
+    },
+    "inv_002": {
+      "itemId": "inv_002",
+      "name": "Canned Tomatoes (USDA)",
+      "category": "canned",
+      "quantity": 120,
+      "unitType": "cans",
+      "weight": 90.0,
+      "bestByDate": "2026-08-01",
+      "receiptDate": "2025-11-10",
+      "handlingType": "non_perishable",
+      "perishabilityTier": "shelf_stable",
+      "familyMax": 4,
+      "supplierId": "sup_001",
+      "donorId": "usda_tefap",
+      "fundingSource": "usda_tefap",
+      "recipientEligibility": "income_eligible",
+      "lotNumber": "TEFAP-2025-11-A-0042",
+      "status": "available"
+    },
+    "inv_003": {
+      "itemId": "inv_003",
+      "name": "Fresh Apples",
+      "category": "fruit",
+      "quantity": 15,
+      "unitType": "lbs",
+      "weight": 15.0,
+      "bestByDate": "2025-11-20",
+      "receiptDate": "2025-11-14",
+      "handlingType": "refrigerated",
+      "perishabilityTier": "medium_7d",
+      "familyMax": 3,
+      "supplierId": "sup_005",
+      "donorId": "sup_005",
+      "fundingSource": "private_donation",
+      "recipientEligibility": "universal",
+      "lotNumber": null,
+      "status": "available"
+    },
+    "inv_004": {
+      "itemId": "inv_004",
+      "name": "Ground Beef",
+      "category": "protein",
+      "quantity": 8,
+      "unitType": "lbs",
+      "weight": 8.0,
+      "bestByDate": "2025-11-17",
+      "receiptDate": "2025-11-15",
+      "handlingType": "frozen",
+      "perishabilityTier": "high_48h",
+      "familyMax": 3,
+      "supplierId": "sup_003",
+      "donorId": "sup_003",
+      "fundingSource": "private_donation",
+      "recipientEligibility": "universal",
+      "lotNumber": null,
+      "status": "available"
+    },
+    "inv_005": {
+      "itemId": "inv_005",
+      "name": "White Rice (USDA)",
+      "category": "grain",
+      "quantity": 50,
+      "unitType": "lbs",
+      "weight": 50.0,
+      "bestByDate": "2027-01-01",
+      "receiptDate": "2025-11-01",
+      "handlingType": "non_perishable",
+      "perishabilityTier": "shelf_stable",
+      "familyMax": 5,
+      "supplierId": "sup_002",
+      "donorId": "usda_tefap",
+      "fundingSource": "usda_tefap",
+      "recipientEligibility": "income_eligible",
+      "lotNumber": "TEFAP-2025-10-B-0158",
+      "status": "available"
+    },
+    "inv_006": {
+      "itemId": "inv_006",
+      "name": "Milk",
+      "category": "dairy",
+      "quantity": 12,
+      "unitType": "gallons",
+      "weight": 102.0,
+      "bestByDate": "2025-11-19",
+      "receiptDate": "2025-11-15",
+      "handlingType": "refrigerated",
+      "perishabilityTier": "medium_7d",
+      "familyMax": 2,
+      "supplierId": "sup_004",
+      "donorId": "sup_004",
+      "fundingSource": "private_donation",
+      "recipientEligibility": "universal",
+      "lotNumber": null,
+      "status": "available"
+    },
+    "inv_007": {
+      "itemId": "inv_007",
+      "name": "Canned Tuna",
+      "category": "protein",
+      "quantity": 80,
+      "unitType": "cans",
+      "weight": 40.0,
+      "bestByDate": "2026-12-01",
+      "receiptDate": "2025-11-05",
+      "handlingType": "non_perishable",
+      "perishabilityTier": "shelf_stable",
+      "familyMax": 4,
+      "supplierId": "sup_001",
+      "donorId": "sup_001",
+      "fundingSource": "private_donation",
+      "recipientEligibility": "universal",
+      "lotNumber": null,
+      "status": "available"
+    },
+    "inv_008": {
+      "itemId": "inv_008",
+      "name": "Fresh Carrots",
+      "category": "vegetable",
+      "quantity": 20,
+      "unitType": "lbs",
+      "weight": 20.0,
+      "bestByDate": "2025-11-22",
+      "receiptDate": "2025-11-14",
+      "handlingType": "refrigerated",
+      "perishabilityTier": "medium_7d",
+      "familyMax": 3,
+      "supplierId": "sup_005",
+      "donorId": "sup_005",
+      "fundingSource": "private_donation",
+      "recipientEligibility": "universal",
+      "lotNumber": null,
+      "status": "available"
+    },
+    "inv_009": {
+      "itemId": "inv_009",
+      "name": "Pasta (CSFP Senior)",
+      "category": "grain",
+      "quantity": 40,
+      "unitType": "boxes",
+      "weight": 40.0,
+      "bestByDate": "2026-06-01",
+      "receiptDate": "2025-11-08",
+      "handlingType": "non_perishable",
+      "perishabilityTier": "shelf_stable",
+      "familyMax": 3,
+      "supplierId": "sup_002",
+      "donorId": "usda_csfp",
+      "fundingSource": "usda_csfp",
+      "recipientEligibility": "seniors_only",
+      "lotNumber": "CSFP-2025-11-C-0089",
+      "status": "available"
+    },
+    "inv_010": {
+      "itemId": "inv_010",
+      "name": "Eggs",
+      "category": "protein",
+      "quantity": 6,
+      "unitType": "dozen",
+      "weight": 4.5,
+      "bestByDate": "2025-11-21",
+      "receiptDate": "2025-11-14",
+      "handlingType": "refrigerated",
+      "perishabilityTier": "medium_7d",
+      "familyMax": 2,
+      "supplierId": "sup_004",
+      "donorId": "sup_004",
+      "fundingSource": "private_donation",
+      "recipientEligibility": "universal",
+      "lotNumber": null,
+      "status": "available"
+    },
+    "inv_011": {
+      "itemId": "inv_011",
+      "name": "Peanut Butter (USDA)",
+      "category": "protein",
+      "quantity": 60,
+      "unitType": "jars",
+      "weight": 112.5,
+      "bestByDate": "2026-09-01",
+      "receiptDate": "2025-11-01",
+      "handlingType": "non_perishable",
+      "perishabilityTier": "shelf_stable",
+      "familyMax": 2,
+      "supplierId": "sup_002",
+      "donorId": "usda_tefap",
+      "fundingSource": "usda_tefap",
+      "recipientEligibility": "income_eligible",
+      "lotNumber": "TEFAP-2025-10-D-0201",
+      "status": "available"
+    },
+    "inv_012": {
+      "itemId": "inv_012",
+      "name": "Canned Green Beans (USDA)",
+      "category": "vegetable",
+      "quantity": 90,
+      "unitType": "cans",
+      "weight": 67.5,
+      "bestByDate": "2026-07-15",
+      "receiptDate": "2025-11-10",
+      "handlingType": "non_perishable",
+      "perishabilityTier": "shelf_stable",
+      "familyMax": 4,
+      "supplierId": "sup_001",
+      "donorId": "usda_tefap",
+      "fundingSource": "usda_tefap",
+      "recipientEligibility": "income_eligible",
+      "lotNumber": "TEFAP-2025-11-A-0043",
+      "status": "available"
+    }
+  },
+  "suppliers": {
+    "sup_001": {
+      "supplierId": "sup_001",
+      "name": "Kroger South Bend",
+      "email": "donations@kroger.com",
+      "type": "grocery_chain",
+      "lastContactDate": "2025-11-10",
+      "responseRate": 0.85,
+      "preferredCategories": ["canned", "grain"],
+      "donationHistory": [
+        {
+          "date": "2025-11-10",
+          "items": ["Canned Tomatoes", "Canned Tuna"],
+          "quantity": 200,
+          "unit": "cans"
+        },
+        {
+          "date": "2025-10-15",
+          "items": ["Canned Beans"],
+          "quantity": 150,
+          "unit": "cans"
+        }
+      ]
+    },
+    "sup_002": {
+      "supplierId": "sup_002",
+      "name": "Costco Mishawaka",
+      "email": "community@costco.com",
+      "type": "grocery_chain",
+      "lastContactDate": "2025-11-08",
+      "responseRate": 0.70,
+      "preferredCategories": ["grain", "canned"],
+      "donationHistory": [
+        {
+          "date": "2025-11-08",
+          "items": ["Rice", "Pasta"],
+          "quantity": 90,
+          "unit": "lbs"
+        },
+        {
+          "date": "2025-09-20",
+          "items": ["Rice"],
+          "quantity": 50,
+          "unit": "lbs"
+        }
+      ]
+    },
+    "sup_003": {
+      "supplierId": "sup_003",
+      "name": "Sam's Meats",
+      "email": "contact@samsmeats.com",
+      "type": "local_butcher",
+      "lastContactDate": "2025-11-15",
+      "responseRate": 0.90,
+      "preferredCategories": ["protein"],
+      "donationHistory": [
+        {
+          "date": "2025-11-15",
+          "items": ["Chicken Breast", "Ground Beef"],
+          "quantity": 33,
+          "unit": "lbs"
+        },
+        {
+          "date": "2025-10-02",
+          "items": ["Chicken Breast"],
+          "quantity": 50,
+          "unit": "lbs"
+        }
+      ]
+    },
+    "sup_004": {
+      "supplierId": "sup_004",
+      "name": "Prairie Farms Dairy",
+      "email": "giving@prairiefarms.com",
+      "type": "manufacturer",
+      "lastContactDate": "2025-11-15",
+      "responseRate": 0.75,
+      "preferredCategories": ["dairy", "protein"],
+      "donationHistory": [
+        {
+          "date": "2025-11-15",
+          "items": ["Milk", "Eggs"],
+          "quantity": 18,
+          "unit": "mixed"
+        },
+        {
+          "date": "2025-10-25",
+          "items": ["Milk"],
+          "quantity": 20,
+          "unit": "gallons"
+        }
+      ]
+    },
+    "sup_005": {
+      "supplierId": "sup_005",
+      "name": "Local Farms Collective",
+      "email": "hello@localfarmscollective.org",
+      "type": "farm",
+      "lastContactDate": "2025-11-14",
+      "responseRate": 0.80,
+      "preferredCategories": ["fruit", "vegetable"],
+      "donationHistory": [
+        {
+          "date": "2025-11-14",
+          "items": ["Apples", "Carrots"],
+          "quantity": 35,
+          "unit": "lbs"
+        },
+        {
+          "date": "2025-10-30",
+          "items": ["Pumpkins", "Squash"],
+          "quantity": 40,
+          "unit": "lbs"
+        }
+      ]
+    },
+    "sup_006": {
+      "supplierId": "sup_006",
+      "name": "Whole Foods Market",
+      "email": "communitygiving@wholefoods.com",
+      "type": "grocery_chain",
+      "lastContactDate": "2025-09-15",
+      "responseRate": 0.60,
+      "preferredCategories": ["fruit", "vegetable", "grain"],
+      "donationHistory": [
+        {
+          "date": "2025-09-15",
+          "items": ["Organic Produce Mix"],
+          "quantity": 30,
+          "unit": "lbs"
+        }
+      ]
+    },
+    "sup_007": {
+      "supplierId": "sup_007",
+      "name": "Panera Bread",
+      "email": "dayendgiving@panerabread.com",
+      "type": "restaurant",
+      "lastContactDate": "2025-08-20",
+      "responseRate": 0.50,
+      "preferredCategories": ["grain", "prepared"],
+      "donationHistory": [
+        {
+          "date": "2025-08-20",
+          "items": ["Bagels", "Bread"],
+          "quantity": 40,
+          "unit": "units"
+        }
+      ]
+    }
+  },
+  "distributions": {
+    "dist_001": {
+      "distributionId": "dist_001",
+      "recipientName": "Maria Garcia",
+      "timestamp": "2025-11-15T10:30:00Z",
+      "householdSize": 4,
+      "eligibilityVerified": true,
+      "distributionMethod": "client_choice",
+      "items": [
+        {
+          "itemId": "inv_002",
+          "itemName": "Canned Tomatoes (USDA)",
+          "quantityTaken": 8,
+          "unitType": "cans"
+        },
+        {
+          "itemId": "inv_005",
+          "itemName": "White Rice (USDA)",
+          "quantityTaken": 5,
+          "unitType": "lbs"
+        },
+        {
+          "itemId": "inv_007",
+          "itemName": "Canned Tuna",
+          "quantityTaken": 4,
+          "unitType": "cans"
+        }
+      ]
+    },
+    "dist_002": {
+      "distributionId": "dist_002",
+      "recipientName": "John Williams",
+      "timestamp": "2025-11-15T11:15:00Z",
+      "householdSize": 2,
+      "eligibilityVerified": true,
+      "distributionMethod": "pre_packed",
+      "items": [
+        {
+          "itemId": "inv_006",
+          "itemName": "Milk",
+          "quantityTaken": 1,
+          "unitType": "gallons"
+        },
+        {
+          "itemId": "inv_010",
+          "itemName": "Eggs",
+          "quantityTaken": 1,
+          "unitType": "dozen"
+        },
+        {
+          "itemId": "inv_003",
+          "itemName": "Fresh Apples",
+          "quantityTaken": 3,
+          "unitType": "lbs"
+        }
+      ]
+    },
+    "dist_003": {
+      "distributionId": "dist_003",
+      "recipientName": "Linda Chen",
+      "timestamp": "2025-11-15T14:45:00Z",
+      "householdSize": 5,
+      "eligibilityVerified": true,
+      "distributionMethod": "client_choice",
+      "items": [
+        {
+          "itemId": "inv_001",
+          "itemName": "Chicken Breast",
+          "quantityTaken": 5,
+          "unitType": "lbs"
+        },
+        {
+          "itemId": "inv_008",
+          "itemName": "Fresh Carrots",
+          "quantityTaken": 3,
+          "unitType": "lbs"
+        },
+        {
+          "itemId": "inv_012",
+          "itemName": "Canned Green Beans (USDA)",
+          "quantityTaken": 4,
+          "unitType": "cans"
+        }
+      ]
+    },
+    "dist_004": {
+      "distributionId": "dist_004",
+      "recipientName": "Robert Taylor (Senior)",
+      "timestamp": "2025-11-14T09:20:00Z",
+      "householdSize": 1,
+      "eligibilityVerified": true,
+      "distributionMethod": "home_delivery",
+      "items": [
+        {
+          "itemId": "inv_009",
+          "itemName": "Pasta (CSFP Senior)",
+          "quantityTaken": 2,
+          "unitType": "boxes"
+        },
+        {
+          "itemId": "inv_011",
+          "itemName": "Peanut Butter (USDA)",
+          "quantityTaken": 1,
+          "unitType": "jars"
+        },
+        {
+          "itemId": "inv_002",
+          "itemName": "Canned Tomatoes (USDA)",
+          "quantityTaken": 3,
+          "unitType": "cans"
+        }
+      ]
+    },
+    "dist_005": {
+      "distributionId": "dist_005",
+      "recipientName": "Ahmed Hassan",
+      "timestamp": "2025-11-14T15:30:00Z",
+      "householdSize": 6,
+      "eligibilityVerified": false,
+      "distributionMethod": "client_choice",
+      "items": [
+        {
+          "itemId": "inv_004",
+          "itemName": "Ground Beef",
+          "quantityTaken": 3,
+          "unitType": "lbs"
+        },
+        {
+          "itemId": "inv_006",
+          "itemName": "Milk",
+          "quantityTaken": 2,
+          "unitType": "gallons"
+        },
+        {
+          "itemId": "inv_007",
+          "itemName": "Canned Tuna",
+          "quantityTaken": 4,
+          "unitType": "cans"
+        }
+      ]
+    }
+  },
+  "analytics": {
+    "averageDailyDemand": {
+      "protein": 15,
+      "grain": 20,
+      "fruit": 10,
+      "vegetable": 12,
+      "dairy": 8,
+      "canned": 25
+    },
+    "currentCrisis": {
+      "active": true,
+      "type": "winter_storm",
+      "description": "Major winter storm forecast for South Bend area in next 48 hours",
+      "projectedDemandIncrease": 2.5,
+      "startDate": "2025-11-17",
+      "endDate": "2025-11-19"
+    }
+  }
+}
