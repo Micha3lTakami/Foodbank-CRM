@@ -1,0 +1,25 @@
+<svg width="96" height="96" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">InventoryIQ – Food Bank Intelligent Inventory Logo</title>
+  <desc id="desc">
+    Minimal logo showing a heart above a crate with three inventory bars inside,
+    representing caring, structured food distribution, and data intelligence.
+  </desc>
+
+  <!-- Soft rounded background -->
+  <rect x="2" y="2" width="76" height="76" rx="18" ry="18" fill="#F7F9FB" stroke="#E1E7EF" stroke-width="2"></rect>
+
+  <!-- Heart (care / community) -->
+  <path d="M40 14
+       C37.5 11 32.5 12.8 32.5 16.6
+       C32.5 21.6 40 25.5 40 25.5
+       C40 25.5 47.5 21.6 47.5 16.6
+       C47.5 12.8 42.5 11 40 14Z" fill="none" stroke="#0B2545" stroke-width="2" stroke-linejoin="round"></path>
+
+  <!-- Crate / container (food bank) -->
+  <rect x="8" y="24" width="64" height="40" rx="8" ry="8" fill="none" stroke="#0B2545" stroke-width="3"></rect>
+
+  <!-- Inventory bars (intelligence / data) -->
+  <rect x="20" y="34" width="8" height="18" rx="2" fill="#3BB273"></rect>
+  <rect x="36" y="30" width="8" height="22" rx="2" fill="#F4D35E"></rect>
+  <rect x="52" y="38" width="8" height="14" rx="2" fill="#EE964B"></rect>
+</svg>

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { db, ref, onValue } from './firebase';
-import InventoryAnalysis from './components/InventoryAnalysis';
-import EmailGenerator from './components/EmailGenerator';
-import ItemMaster from './components/ItemMaster';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
+import { InventoryDashboard } from './components/InventoryDashboard';
+import { OutreachDashboard } from './components/OutreachDashboard';
+import { Package, Users } from 'lucide-react';
+import pantryIQLogo from './Images/pantryIQLogo.svg';
 
 function App() {
   const [inventory, setInventory] = useState({});
@@ -10,11 +12,10 @@ function App() {
   const [distributions, setDistributions] = useState({});
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [criticalCategory, setCriticalCategory] = useState(null);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' or 'itemmaster'
+  const [activeTab, setActiveTab] = useState('inventory');
 
   useEffect(() => {
-    // Listen to all database sections
+    // Listen to all database sections with realtime Firebase listeners
     const inventoryRef = ref(db, 'inventory');
     const suppliersRef = ref(db, 'suppliers');
     const distributionsRef = ref(db, 'distributions');
@@ -26,6 +27,7 @@ function App() {
       if (loadedCount === 4) setLoading(false);
     };
 
+    // Realtime listeners - these update automatically when data changes in Firebase
     onValue(inventoryRef, (snapshot) => {
       setInventory(snapshot.val() || {});
       checkAllLoaded();
@@ -47,180 +49,61 @@ function App() {
     });
   }, []);
 
-  if (loading) return <div style={{ padding: '20px' }}>Loading database...</div>;
-
-  // Navigation Component
-  const Navigation = () => (
-    <div style={{
-      backgroundColor: '#f5f5f5',
-      padding: '15px 20px',
-      marginBottom: '20px',
-      borderRadius: '8px',
-      display: 'flex',
-      gap: '10px',
-      borderBottom: '2px solid #4CAF50'
-    }}>
-      <button
-        onClick={() => setCurrentView('dashboard')}
-        style={{
-          padding: '10px 20px',
-          fontSize: '16px',
-          backgroundColor: currentView === 'dashboard' ? '#4CAF50' : '#e0e0e0',
-          color: currentView === 'dashboard' ? 'white' : '#333',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontWeight: currentView === 'dashboard' ? 'bold' : 'normal'
-        }}
-      >
-        📊 CRM Dashboard
-      </button>
-      <button
-        onClick={() => setCurrentView('itemmaster')}
-        style={{
-          padding: '10px 20px',
-          fontSize: '16px',
-          backgroundColor: currentView === 'itemmaster' ? '#4CAF50' : '#e0e0e0',
-          color: currentView === 'itemmaster' ? 'white' : '#333',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontWeight: currentView === 'itemmaster' ? 'bold' : 'normal'
-        }}
-      >
-        📦 Item Master
-      </button>
-    </div>
-  );
-
-  // Render Item Master view
-  if (currentView === 'itemmaster') {
+  if (loading) {
     return (
-      <div style={{ fontFamily: 'Arial, sans-serif' }}>
-        <Navigation />
-        <ItemMaster />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading database...</div>
       </div>
     );
   }
 
-  // Render Dashboard view
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <Navigation />
-      <h1>🥫 Food Bank CRM - AI-Powered Supplier Outreach</h1>
-      
-      {/* AI Features Section */}
-      <section style={{ marginBottom: '30px' }}>
-        <InventoryAnalysis 
-          onCriticalCategorySelected={setCriticalCategory}
-          inventory={inventory}
-          analytics={analytics}
-        />
-        <EmailGenerator 
-          criticalCategory={criticalCategory}
-          inventory={inventory}
-          suppliers={suppliers}
-          analytics={analytics}
-        />
-      </section>
-      
-      {/* Inventory Section */}
-      <section style={{ marginBottom: '30px', border: '2px solid #4CAF50', padding: '15px', borderRadius: '8px' }}>
-        <h2>📦 Inventory ({Object.keys(inventory).length} items)</h2>
-        {Object.values(inventory).slice(0, 3).map(item => (
-          <div key={item.itemId} style={{ 
-            backgroundColor: '#f0f0f0', 
-            padding: '10px', 
-            margin: '10px 0',
-            borderRadius: '5px'
-          }}>
-            <strong>{item.name}</strong> - {item.quantity} {item.unitType}
-            <br />
-            <small>Category: {item.foodCategory || item.category} | Best By: {item.bestByDate} | Funding: {item.fundingSource}</small>
-          </div>
-        ))}
-        <p><em>Showing 3 of {Object.keys(inventory).length} items</em></p>
-      </section>
-
-      {/* Suppliers Section */}
-      <section style={{ marginBottom: '30px', border: '2px solid #2196F3', padding: '15px', borderRadius: '8px' }}>
-        <h2>🏪 Suppliers ({Object.keys(suppliers).length} suppliers)</h2>
-        {Object.values(suppliers).slice(0, 3).map(supplier => (
-          <div key={supplier.supplierId} style={{ 
-            backgroundColor: '#e3f2fd', 
-            padding: '10px', 
-            margin: '10px 0',
-            borderRadius: '5px'
-          }}>
-            <strong>{supplier.name}</strong> ({supplier.type})
-            <br />
-            <small>Email: {supplier.email} | Response Rate: {(supplier.responseRate * 100).toFixed(0)}%</small>
-            <br />
-            <small>Last Contact: {supplier.lastContactDate} | Donations: {supplier.donationHistory.length}</small>
-          </div>
-        ))}
-        <p><em>Showing 3 of {Object.keys(suppliers).length} suppliers</em></p>
-      </section>
-
-      {/* Distributions Section */}
-      <section style={{ marginBottom: '30px', border: '2px solid #FF9800', padding: '15px', borderRadius: '8px' }}>
-        <h2>📤 Distributions ({Object.keys(distributions).length} events)</h2>
-        {Object.values(distributions).slice(0, 3).map(dist => (
-          <div key={dist.distributionId} style={{ 
-            backgroundColor: '#fff3e0', 
-            padding: '10px', 
-            margin: '10px 0',
-            borderRadius: '5px'
-          }}>
-            <strong>{dist.recipientName}</strong> (Household: {dist.householdSize})
-            <br />
-            <small>Method: {dist.distributionMethod} | Verified: {dist.eligibilityVerified ? '✅' : '❌'}</small>
-            <br />
-            <small>Items taken: {dist.items.length} | Time: {new Date(dist.timestamp).toLocaleString()}</small>
-          </div>
-        ))}
-        <p><em>Showing 3 of {Object.keys(distributions).length} distribution events</em></p>
-      </section>
-
-      {/* Analytics Section */}
-      <section style={{ marginBottom: '30px', border: '2px solid #9C27B0', padding: '15px', borderRadius: '8px' }}>
-        <h2>📊 Analytics & Crisis Info</h2>
-        <div style={{ backgroundColor: '#f3e5f5', padding: '10px', borderRadius: '5px' }}>
-          <h3>Average Daily Demand:</h3>
-          <ul>
-            {analytics?.averageDailyDemand && Object.entries(analytics.averageDailyDemand).map(([category, demand]) => (
-              <li key={category}><strong>{category}:</strong> {demand} units/day</li>
-            ))}
-          </ul>
-          
-          <h3>Current Crisis:</h3>
-          {analytics?.currentCrisis?.active ? (
-            <div style={{ backgroundColor: '#ffebee', padding: '10px', borderRadius: '5px', marginTop: '10px' }}>
-              <strong>⚠️ ACTIVE: {analytics.currentCrisis.type}</strong>
-              <br />
-              {analytics.currentCrisis.description}
-              <br />
-              <small>Period: {analytics.currentCrisis.startDate} to {analytics.currentCrisis.endDate}</small>
-              <br />
-              <small>Projected Demand Increase: {analytics.currentCrisis.projectedDemandIncrease}x</small>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src={pantryIQLogo} alt="PantryIQ Logo" className="w-10 h-10" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">PantryIQ</h1>
+                <p className="text-sm text-gray-600 mt-0.5">Inventory tracking and supplier outreach</p>
+              </div>
             </div>
-          ) : (
-            <p>No active crisis</p>
-          )}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
+              <TabsList className="grid grid-cols-2">
+                <TabsTrigger value="inventory" className="flex items-center gap-2">
+                  <Package className="w-4 h-4" />
+                  Inventory
+                </TabsTrigger>
+                <TabsTrigger value="outreach" className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Outreach
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
-      </section>
+      </header>
 
-      {/* Summary */}
-      <section style={{ backgroundColor: '#e8f5e9', padding: '15px', borderRadius: '8px' }}>
-        <h2>✅ Database Connection Test: SUCCESS</h2>
-        <p>All sections loaded correctly:</p>
-        <ul>
-          <li>✅ Inventory: {Object.keys(inventory).length} items</li>
-          <li>✅ Suppliers: {Object.keys(suppliers).length} suppliers</li>
-          <li>✅ Distributions: {Object.keys(distributions).length} events</li>
-          <li>✅ Analytics: {analytics ? 'Loaded' : 'Missing'}</li>
-        </ul>
-      </section>
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsContent value="inventory" className="mt-0">
+            <InventoryDashboard 
+              inventory={inventory}
+              analytics={analytics}
+              distributions={distributions}
+            />
+          </TabsContent>
+
+          <TabsContent value="outreach" className="mt-0">
+            <OutreachDashboard 
+              inventory={inventory}
+              analytics={analytics}
+              suppliers={suppliers}
+            />
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 }
