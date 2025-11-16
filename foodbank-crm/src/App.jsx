@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { db, ref, onValue } from './firebase';
+import InventoryAnalysis from './components/InventoryAnalysis';
+import EmailGenerator from './components/EmailGenerator';
+import ItemMaster from './components/ItemMaster';
 
 function App() {
   const [inventory, setInventory] = useState({});
@@ -7,6 +10,8 @@ function App() {
   const [distributions, setDistributions] = useState({});
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [criticalCategory, setCriticalCategory] = useState(null);
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' or 'itemmaster'
 
   useEffect(() => {
     // Listen to all database sections
@@ -44,9 +49,80 @@ function App() {
 
   if (loading) return <div style={{ padding: '20px' }}>Loading database...</div>;
 
+  // Navigation Component
+  const Navigation = () => (
+    <div style={{
+      backgroundColor: '#f5f5f5',
+      padding: '15px 20px',
+      marginBottom: '20px',
+      borderRadius: '8px',
+      display: 'flex',
+      gap: '10px',
+      borderBottom: '2px solid #4CAF50'
+    }}>
+      <button
+        onClick={() => setCurrentView('dashboard')}
+        style={{
+          padding: '10px 20px',
+          fontSize: '16px',
+          backgroundColor: currentView === 'dashboard' ? '#4CAF50' : '#e0e0e0',
+          color: currentView === 'dashboard' ? 'white' : '#333',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          fontWeight: currentView === 'dashboard' ? 'bold' : 'normal'
+        }}
+      >
+        📊 CRM Dashboard
+      </button>
+      <button
+        onClick={() => setCurrentView('itemmaster')}
+        style={{
+          padding: '10px 20px',
+          fontSize: '16px',
+          backgroundColor: currentView === 'itemmaster' ? '#4CAF50' : '#e0e0e0',
+          color: currentView === 'itemmaster' ? 'white' : '#333',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          fontWeight: currentView === 'itemmaster' ? 'bold' : 'normal'
+        }}
+      >
+        📦 Item Master
+      </button>
+    </div>
+  );
+
+  // Render Item Master view
+  if (currentView === 'itemmaster') {
+    return (
+      <div style={{ fontFamily: 'Arial, sans-serif' }}>
+        <Navigation />
+        <ItemMaster />
+      </div>
+    );
+  }
+
+  // Render Dashboard view
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>🥫 Food Bank CRM - Database Test</h1>
+      <Navigation />
+      <h1>🥫 Food Bank CRM - AI-Powered Supplier Outreach</h1>
+      
+      {/* AI Features Section */}
+      <section style={{ marginBottom: '30px' }}>
+        <InventoryAnalysis 
+          onCriticalCategorySelected={setCriticalCategory}
+          inventory={inventory}
+          analytics={analytics}
+        />
+        <EmailGenerator 
+          criticalCategory={criticalCategory}
+          inventory={inventory}
+          suppliers={suppliers}
+          analytics={analytics}
+        />
+      </section>
       
       {/* Inventory Section */}
       <section style={{ marginBottom: '30px', border: '2px solid #4CAF50', padding: '15px', borderRadius: '8px' }}>
@@ -60,7 +136,7 @@ function App() {
           }}>
             <strong>{item.name}</strong> - {item.quantity} {item.unitType}
             <br />
-            <small>Category: {item.category} | Best By: {item.bestByDate} | Funding: {item.fundingSource}</small>
+            <small>Category: {item.foodCategory || item.category} | Best By: {item.bestByDate} | Funding: {item.fundingSource}</small>
           </div>
         ))}
         <p><em>Showing 3 of {Object.keys(inventory).length} items</em></p>
