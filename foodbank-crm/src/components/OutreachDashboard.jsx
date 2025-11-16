@@ -86,10 +86,10 @@ const calculateCategorySupply = (inventory, analytics) => {
   
   return Object.entries(analytics?.averageDailyDemand || {}).map(([category, demand]) => {
     const categoryItems = inventoryItems.filter(i => (i.foodCategory || i.category) === category);
-    const totalQuantity = categoryItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    const totalQuantity = categoryItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
     
-    const crisisMultiplier = analytics?.currentCrisis?.active ? analytics.currentCrisis.projectedDemandIncrease : 1;
-    const adjustedDemand = demand * crisisMultiplier;
+    const crisisMultiplier = analytics?.currentCrisis?.active ? Number(analytics.currentCrisis.projectedDemandIncrease) : 1;
+    const adjustedDemand = Number(demand) * crisisMultiplier;
     const daysOfSupply = totalQuantity / adjustedDemand;
     const gapPercentage = Math.max(0, ((3 - daysOfSupply) / 3) * 100);
     
@@ -99,11 +99,11 @@ const calculateCategorySupply = (inventory, analytics) => {
     
     return {
       category,
-      currentStock: `${totalQuantity.toFixed(0)} units`,
-      daysRemaining: daysOfSupply,
+      currentStock: `${Number(totalQuantity).toFixed(0)} units`,
+      daysRemaining: Number(daysOfSupply) || 0,
       status,
-      gapPercentage: Math.min(100, gapPercentage),
-      demand: adjustedDemand,
+      gapPercentage: Math.min(100, Number(gapPercentage) || 0),
+      demand: Number(adjustedDemand) || 0,
     };
   });
 };
@@ -144,8 +144,11 @@ const generateEmail = (supplier, categorySupply, analytics) => {
   const urgency = targetCategory ? urgencyMap[targetCategory.status] : 'General';
 
   // Crisis context
+  const demandIncrease = analytics?.currentCrisis?.active 
+    ? (((Number(analytics.currentCrisis.projectedDemandIncrease) || 1) - 1) * 100).toFixed(0)
+    : '0';
   const crisisContext = analytics?.currentCrisis?.active 
-    ? `\n\n🚨 CRISIS SITUATION 🚨\nWe're currently responding to a ${analytics.currentCrisis.type?.replace('_', ' ')}. ${analytics.currentCrisis.description}\n\nThis crisis has increased our demand by ${((analytics.currentCrisis.projectedDemandIncrease - 1) * 100).toFixed(0)}%, making your support more critical than ever.`
+    ? `\n\n🚨 CRISIS SITUATION 🚨\nWe're currently responding to a ${analytics.currentCrisis.type?.replace('_', ' ')}. ${analytics.currentCrisis.description}\n\nThis crisis has increased our demand by ${demandIncrease}%, making your support more critical than ever.`
     : '';
 
   return `${greeting}
@@ -160,7 +163,7 @@ ${targetCategory ? `We're currently running critically low on ${categoryName} it
 Current demand: ${targetCategory.demand.toFixed(1)} units per day
 Available stock: ${targetCategory.currentStock}` : 'We\'re currently experiencing critical supply shortages and need your support.'}
 
-Based on your specialization in ${supplier.preferredCategories?.map(c => c.charAt(0).toUpperCase() + c.slice(1)).join(', ') || 'food donations'} and your strong response rate of ${((supplier.responseRate || 0) * 100).toFixed(0)}%, we're hoping you can help with:
+Based on your specialization in ${supplier.preferredCategories?.map(c => c.charAt(0).toUpperCase() + c.slice(1)).join(', ') || 'food donations'} and your strong response rate of ${((Number(supplier.responseRate) || 0) * 100).toFixed(0)}%, we're hoping you can help with:
 ${targetCategory && supplier.preferredCategories?.includes(targetCategory.category) ? `• ${categoryName} items (your specialty - any amount would help!)` : targetCategory ? `• ${categoryName} items` : '• Food items'}
 • Other donations from your available inventory
 
@@ -347,7 +350,7 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
                         <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-600 mb-2">
                           <div>Last contact: {supplier.lastContactDate || 'Never'}</div>
                           <div>Total donations: {supplier.donationHistory?.length || 0}</div>
-                          <div>Response rate: {((supplier.responseRate || 0) * 100).toFixed(0)}%</div>
+                          <div>Response rate: {((Number(supplier.responseRate) || 0) * 100).toFixed(0)}%</div>
                           <div>Categories: {supplier.preferredCategories?.join(', ') || 'N/A'}</div>
                         </div>
                         {supplier.donationHistory?.[0] && (
@@ -392,7 +395,7 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
                         <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-600 mb-2">
                           <div>Last contact: {supplier.lastContactDate || 'Never'}</div>
                           <div>Total donations: {supplier.donationHistory?.length || 0}</div>
-                          <div>Response rate: {((supplier.responseRate || 0) * 100).toFixed(0)}%</div>
+                          <div>Response rate: {((Number(supplier.responseRate) || 0) * 100).toFixed(0)}%</div>
                           <div>Categories: {supplier.preferredCategories?.join(', ') || 'N/A'}</div>
                         </div>
                         {supplier.donationHistory?.[0] && (
@@ -438,7 +441,7 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
                         <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-600 mb-2">
                           <div>Last contact: {supplier.lastContactDate || 'Never'}</div>
                           <div>Total donations: {supplier.donationHistory?.length || 0}</div>
-                          <div>Response rate: {((supplier.responseRate || 0) * 100).toFixed(0)}%</div>
+                          <div>Response rate: {((Number(supplier.responseRate) || 0) * 100).toFixed(0)}%</div>
                           <div>Categories: {supplier.preferredCategories?.join(', ') || 'N/A'}</div>
                         </div>
                         {supplier.donationHistory?.[0] && (
@@ -481,7 +484,7 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
                 <CardDescription>
                   For {selectedSupplier.name} ({selectedSupplier.type}) • {selectedSupplier.email}
                   <br />
-                  Response Rate: {((selectedSupplier.responseRate || 0) * 100).toFixed(0)}% • 
+                  Response Rate: {((Number(selectedSupplier.responseRate) || 0) * 100).toFixed(0)}% • 
                   {' '}{selectedSupplier.donationHistory?.length || 0} past donations • 
                   {' '}Specializes in {selectedSupplier.preferredCategories?.join(', ') || 'various categories'}
                 </CardDescription>
@@ -529,7 +532,7 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-blue-600" />
                 <span className="text-gray-600">
-                  Personalized based on {(selectedSupplier.responseRate || 0) >= 0.7 ? 'strong' : 'moderate'} {((selectedSupplier.responseRate || 0) * 100).toFixed(0)}% response rate and {selectedSupplier.type} supplier type.
+                  Personalized based on {(Number(selectedSupplier.responseRate) || 0) >= 0.7 ? 'strong' : 'moderate'} {((Number(selectedSupplier.responseRate) || 0) * 100).toFixed(0)}% response rate and {selectedSupplier.type} supplier type.
                 </span>
               </div>
             </div>
