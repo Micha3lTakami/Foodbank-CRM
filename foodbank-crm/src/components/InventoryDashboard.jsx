@@ -257,6 +257,20 @@ export function InventoryDashboard({ inventory, analytics, distributions }) {
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 5);
 
+  // All distributions sorted by date (most recent first)
+  const allDistributions = distributionRecords
+    .filter(dist => dist.timestamp) // Only show distributions with timestamps
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+  // Format timestamp to 11-30 format (hour-minute)
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return 'N/A';
+    const date = new Date(timestamp);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    return `${hours}-${minutes.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Crisis Alert */}
@@ -589,6 +603,71 @@ export function InventoryDashboard({ inventory, analytics, distributions }) {
                   </tbody>
                 </table>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="distributions" className="space-y-6 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Distributions</CardTitle>
+              <CardDescription>Complete distribution history from the database</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {allDistributions.length > 0 ? (
+                <div className="space-y-4">
+                  {allDistributions.map((dist) => (
+                    <div key={dist.distributionId} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="text-gray-900 font-medium">{dist.recipientName}</span>
+                            {dist.eligibilityVerified && (
+                              <Badge className="bg-green-600">
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                Verified
+                              </Badge>
+                            )}
+                            <Badge variant="outline">
+                              {dist.distributionMethod?.replace('_', ' ') || 'N/A'}
+                            </Badge>
+                          </div>
+                          <div className="text-gray-600">
+                            Household size: {dist.householdSize || 'N/A'}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-gray-900 font-medium text-lg">
+                            {formatTimestamp(dist.timestamp)}
+                          </div>
+                          <div className="text-gray-600 text-sm">
+                            {new Date(dist.timestamp).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                      {dist.items && dist.items.length > 0 && (
+                        <div className="space-y-2 mt-3">
+                          <div className="text-gray-600 text-sm font-medium">Items distributed:</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {dist.items.map((item, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded text-gray-900">
+                                <span className="text-sm">{item.itemName || item.name || 'Item'}</span>
+                                <span className="text-sm font-medium">
+                                  {item.quantityTaken || item.quantity || 0} {item.unitType || item.unit || ''}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  No distributions found in the database
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

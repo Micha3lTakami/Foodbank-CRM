@@ -4,6 +4,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { generateEmails } from '../services/api';
 import { 
   Mail, 
   TrendingUp, 
@@ -14,6 +15,7 @@ import {
   Check,
   AlertCircle,
   BarChart3,
+  Loader2,
 } from 'lucide-react';
 
 const getSegmentBadge = (lastContactDate) => {
@@ -182,20 +184,120 @@ P.S. You can simply reply to this email with your availability or call us at (55
 export function OutreachDashboard({ inventory, analytics, suppliers: suppliersData }) {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [generatedEmail, setGeneratedEmail] = useState('');
+  const [emailSubject, setEmailSubject] = useState('');
   const [copied, setCopied] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState(null);
 
   const suppliersList = Object.values(suppliersData || {});
   const categorySupply = calculateCategorySupply(inventory, analytics);
   const inventoryItems = Object.values(inventory || {});
 
-  const handleGenerateEmail = (supplier) => {
+  const handleGenerateEmail = async (supplier) => {
     setSelectedSupplier(supplier);
-    const email = generateEmail(supplier, categorySupply, analytics);
-    setGeneratedEmail(email);
+    setGenerating(true);
+    setError(null);
+    setGeneratedEmail('');
+    setEmailSubject('');
+
+    try {
+      // Find the most critical category that matches supplier's preferences
+      const criticalCategories = categorySupply
+        .filter(c => c.status === 'critical')
+        .sort((a, b) => b.gapPercentage - a.gapPercentage);
+      
+      const matchingCategory = criticalCategories.find(c => 
+        supplier.preferredCategories?.includes(c.category)
+      );
+      
+      const targetCategory = matchingCategory || criticalCategories[0] || categorySupply[0];
+
+      if (!targetCategory) {
+        setError('No critical categories found. Please check inventory levels.');
+        setGenerating(false);
+        return;
+      }
+
+      // Prepare crisis context if active
+      const crisisContext = analytics?.currentCrisis?.active ? {
+        event_type: analytics.currentCrisis.type || 'general_crisis',
+        severity: analytics.currentCrisis.severity || 'moderate',
+        description: analytics.currentCrisis.description || '',
+        projectedDemandIncrease: analytics.currentCrisis.projectedDemandIncrease || 1
+      } : null;
+
+      // Call the API to generate email using Claude AI
+      const result = await generateEmails(
+        targetCategory.category,
+        targetCategory.daysRemaining,
+        inventory,
+        suppliersData,
+        crisisContext
+      );
+
+      let finalSubject = 'Request for Support - Help Needed for Critical Supply Shortage';
+      let finalBody = '';
+
+      // Find the email for this specific supplier
+      const supplierEmail = result.emails?.find(
+        email => email.supplier_id === supplier.supplierId || 
+                 email.supplier_name === supplier.name
+      );
+
+      if (supplierEmail) {
+        finalSubject = supplierEmail.subject || finalSubject;
+        finalBody = supplierEmail.body || '';
+      } else if (result.emails && result.emails.length > 0) {
+        // If exact match not found, use the first one and update it
+        const firstEmail = result.emails[0];
+        finalSubject = firstEmail.subject || finalSubject;
+        // Use the generated email but personalize it with supplier name
+        finalBody = firstEmail.body || '';
+        finalBody = finalBody.replace(/Hi [^,]+/g, `Hi ${supplier.name}`);
+        finalBody = finalBody.replace(/Hello [^,]+/g, `Hello ${supplier.name}`);
+      } else {
+        // Fallback to local generation if API fails
+        finalBody = generateEmail(supplier, categorySupply, analytics);
+      }
+
+      setEmailSubject(finalSubject);
+      setGeneratedEmail(finalBody);
+
+      // Open native email app with mailto: link
+      const supplierEmailAddress = supplier.email || supplier.contact_email || '';
+      if (supplierEmailAddress) {
+        // Encode the subject and body for URL
+        const encodedSubject = encodeURIComponent(finalSubject);
+        const encodedBody = encodeURIComponent(finalBody);
+        const mailtoLink = `mailto:${supplierEmailAddress}?subject=${encodedSubject}&body=${encodedBody}`;
+        window.location.href = mailtoLink;
+      } else {
+        setError('Supplier email address not found. Email generated but cannot open email client.');
+      }
+    } catch (err) {
+      console.error('Error generating email:', err);
+      setError(err.message || 'Failed to generate email. Using fallback generation.');
+      // Fallback to local generation
+      const email = generateEmail(supplier, categorySupply, analytics);
+      setEmailSubject('Request for Support - Help Needed for Critical Supply Shortage');
+      setGeneratedEmail(email);
+      
+      // Still try to open email app with fallback
+      const supplierEmailAddress = supplier.email || supplier.contact_email || '';
+      if (supplierEmailAddress) {
+        const encodedSubject = encodeURIComponent('Request for Support - Help Needed for Critical Supply Shortage');
+        const encodedBody = encodeURIComponent(email);
+        const mailtoLink = `mailto:${supplierEmailAddress}?subject=${encodedSubject}&body=${encodedBody}`;
+        window.location.href = mailtoLink;
+      }
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(generatedEmail);
+    const fullEmail = `Subject: ${emailSubject || 'Request for Support'}\n\n${generatedEmail}`;
+    navigator.clipboard.writeText(fullEmail);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -362,9 +464,19 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
                       <Button 
                         onClick={() => handleGenerateEmail(supplier)}
                         className="ml-4"
+                        disabled={generating}
                       >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Generate Email
+                        {generating && selectedSupplier?.supplierId === supplier.supplierId ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Generate Email
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -471,8 +583,17 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
         </CardContent>
       </Card>
 
+      {/* Error Message */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       {/* AI-Generated Email */}
-      {selectedSupplier && generatedEmail && (
+      {selectedSupplier && (generatedEmail || generating) && (
         <Card className="border-blue-200 bg-blue-50">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -480,6 +601,7 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-blue-600" />
                   AI-Generated Personalized Outreach Email
+                  {generating && <Loader2 className="w-4 h-4 animate-spin ml-2" />}
                 </CardTitle>
                 <CardDescription>
                   For {selectedSupplier.name} ({selectedSupplier.type}) • {selectedSupplier.email}
@@ -489,53 +611,66 @@ export function OutreachDashboard({ inventory, analytics, suppliers: suppliersDa
                   {' '}Specializes in {selectedSupplier.preferredCategories?.join(', ') || 'various categories'}
                 </CardDescription>
               </div>
-              <Button 
-                onClick={handleCopy}
-                variant="outline"
-                className="bg-white"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 mr-2" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy Email
-                  </>
-                )}
-              </Button>
+              {generatedEmail && (
+                <Button 
+                  onClick={handleCopy}
+                  variant="outline"
+                  className="bg-white"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Email
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
-            <div className="bg-white rounded-lg p-4 border">
-              <div className="mb-4 pb-4 border-b">
-                <div className="text-gray-600 mb-1">To: {selectedSupplier.email}</div>
-                <div className="text-gray-900">
-                  Subject: {analytics?.currentCrisis?.active ? `URGENT - Crisis Response Needed` : `Request for Support`} - Help Needed for Critical Supply Shortage
+            {generating ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+                  <p className="text-gray-600">Generating personalized email with Claude AI...</p>
                 </div>
               </div>
-              <Textarea 
-                value={generatedEmail}
-                onChange={(e) => setGeneratedEmail(e.target.value)}
-                className="min-h-[500px] font-mono bg-gray-50 border-0"
-              />
-            </div>
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-blue-600" />
-                <span className="text-gray-600">
-                  This email references their {selectedSupplier.donationHistory?.length || 0} donation history, highlights urgent category needs, and includes crisis context.
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-blue-600" />
-                <span className="text-gray-600">
-                  Personalized based on {(Number(selectedSupplier.responseRate) || 0) >= 0.7 ? 'strong' : 'moderate'} {((Number(selectedSupplier.responseRate) || 0) * 100).toFixed(0)}% response rate and {selectedSupplier.type} supplier type.
-                </span>
-              </div>
-            </div>
+            ) : generatedEmail ? (
+              <>
+                <div className="bg-white rounded-lg p-4 border">
+                  <div className="mb-4 pb-4 border-b">
+                    <div className="text-gray-600 mb-1">To: {selectedSupplier.email}</div>
+                    <div className="text-gray-900 font-medium">
+                      Subject: {emailSubject || (analytics?.currentCrisis?.active ? `URGENT - Crisis Response Needed` : `Request for Support`)} - Help Needed for Critical Supply Shortage
+                    </div>
+                  </div>
+                  <Textarea 
+                    value={generatedEmail}
+                    onChange={(e) => setGeneratedEmail(e.target.value)}
+                    className="min-h-[500px] font-mono bg-gray-50 border-0"
+                  />
+                </div>
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-blue-600" />
+                    <span className="text-gray-600">
+                      This email was generated by Claude AI and references their {selectedSupplier.donationHistory?.length || 0} donation history, highlights urgent category needs, and includes crisis context.
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-blue-600" />
+                    <span className="text-gray-600">
+                      Personalized based on {(Number(selectedSupplier.responseRate) || 0) >= 0.7 ? 'strong' : 'moderate'} {((Number(selectedSupplier.responseRate) || 0) * 100).toFixed(0)}% response rate and {selectedSupplier.type} supplier type.
+                    </span>
+                  </div>
+                </div>
+              </>
+            ) : null}
           </CardContent>
         </Card>
       )}
